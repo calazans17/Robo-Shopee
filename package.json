@@ -1,0 +1,24 @@
+{
+  "name": "shopee-achadinhos-bot",
+  "version": "1.0.0",
+  "description": "Robo que busca ofertas na API de afiliados da Shopee e manda todo dia num grupo de WhatsApp",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "login": "node src/whatsappLogin.js",
+    "list-groups": "node src/listGroups.js",
+    "test-shopee": "node src/testShopee.js",
+    "send-now": "node src/sendNow.js",
+    "web": "node src/webServer.js"
+  },
+  "dependencies": {
+    "@hapi/boom": "^10.0.1",
+    "@whiskeysockets/baileys": "^6.7.9",
+    "dotenv": "^16.4.5",
+    "express": "^4.22.3",
+    "node-cron": "^3.0.3",
+    "pino": "^9.4.0",
+    "qrcode-terminal": "^0.12.0"
+  }
+}

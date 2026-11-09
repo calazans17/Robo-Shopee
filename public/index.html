@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Achadinhos Shopee - Painel</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1>🔥 Achadinhos Shopee</h1>
+    <div id="status" class="status status--pending">Conectando ao WhatsApp...</div>
+  </header>
+
+  <main>
+    <section class="controls">
+      <label for="limit">Quantidade de ofertas</label>
+      <input type="number" id="limit" min="1" max="20" value="20" />
+      <button id="fetchBtn">Buscar ofertas</button>
+      <span id="fetchStatus" class="hint"></span>
+    </section>
+
+    <section id="offersList" class="offers"></section>
+
+    <section id="sendBar" class="send-bar" hidden>
+      <button id="sendBtn">Enviar <span id="sendCount">0</span> oferta(s) pro grupo</button>
+      <span id="sendStatus" class="hint"></span>
+    </section>
+
+    <pre id="log" class="log" hidden></pre>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
