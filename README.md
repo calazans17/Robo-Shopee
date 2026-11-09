@@ -79,15 +79,18 @@ flowchart LR
 - **pino** e **dotenv**: logs e configuração
 - **PM2**: gerenciamento do processo em produção
 
-## 🚀 Como rodar
+## 🚀 Como rodar (em qualquer máquina)
+
+Este passo a passo serve para instalar do zero em um computador ou servidor novo.
 
 ### Pré-requisitos
 
-- Node.js 18 ou superior
-- Conta de afiliado na [Shopee Affiliate Open Platform](https://open-api.affiliate.shopee.com.br/), com App ID e App Secret
-- Um número de WhatsApp para o robô
+- **Node.js 18 ou superior** ([nodejs.org](https://nodejs.org/)); confira com `node -v`
+- **Git**
+- **App ID e App Secret** da [Shopee Affiliate Open Platform](https://open-api.affiliate.shopee.com.br/)
+- **Celular com o WhatsApp** da conta que vai enviar as mensagens. Essa conta precisa estar no grupo de destino.
 
-### 1. Instalar
+### 1. Baixar o projeto e instalar as dependências
 
 ```bash
 git clone https://github.com/calazans17/Robo-Shopee.git
@@ -95,46 +98,103 @@ cd Robo-Shopee
 npm install
 ```
 
-### 2. Configurar
+### 2. Colocar a chave da Shopee 🔑
+
+As credenciais ficam no arquivo **`.env`** na raiz do projeto. Ele nunca vai para o GitHub, então é preciso criá-lo em cada máquina:
 
 ```bash
-cp .env.example .env
+cp .env.example .env        # Linux / macOS / WSL
+copy .env.example .env      # Windows (cmd)
 ```
 
-| Variável | Descrição | Exemplo |
-|---|---|---|
-| `SHOPEE_APP_ID` | App ID do painel de afiliado | `123456` |
-| `SHOPEE_APP_SECRET` | App Secret do painel de afiliado | `xxxxxxxx` |
-| `SHOPEE_API_URL` | Endpoint GraphQL | `https://open-api.affiliate.shopee.com.br/graphql` |
-| `WHATSAPP_GROUP_ID` | ID do grupo de destino | `123456789-123456789@g.us` |
-| `SCHEDULE_CRON` | Horário diário de envio (cron) | `0 9 * * *` (todo dia às 9h) |
-| `OFFERS_PER_DAY` | Quantas ofertas mandar por dia | `5` |
-| `SHOPEE_KEYWORD` | Filtro por palavra-chave (opcional) | `cozinha` |
+Abra o `.env` em qualquer editor e preencha:
 
-### 3. Conectar o WhatsApp
+```env
+SHOPEE_APP_ID=seu_app_id_aqui
+SHOPEE_APP_SECRET=seu_app_secret_aqui
+```
+
+> **Onde pegar:** entre no painel de afiliado da Shopee Open Platform e abra **Open API**. O **App ID** e o **App Secret** estão lá. Não compartilhe o Secret com ninguém.
+
+Teste se a chave está funcionando (nada é enviado ao WhatsApp):
+
+```bash
+npm run test-shopee
+```
+
+Se aparecer a lista de ofertas no terminal, a integração com a Shopee está ok.
+
+### 3. Vincular o WhatsApp pelo QR code 📱
 
 ```bash
 npm run login
 ```
 
-Escaneie o QR code em **WhatsApp › Aparelhos conectados › Conectar um aparelho**. A sessão fica salva localmente e não precisa ser refeita.
+1. Um **QR code** aparece no terminal.
+2. No celular, abra o WhatsApp e vá em **⋮ / Configurações › Aparelhos conectados › Conectar um aparelho**.
+3. Escaneie o QR code da tela.
+4. O terminal mostra `Login concluido!`. Aperte `Ctrl + C` para sair.
 
-### 4. Descobrir o ID do grupo
+A sessão fica salva na pasta `auth_baileys/`. Enquanto o aparelho não for desconectado pelo celular, **não é preciso escanear de novo**.
+
+> 💡 Se o QR expirar antes de você escanear, ele é gerado de novo automaticamente. Se o terminal deixar o QR quebrado, aumente a janela ou diminua a fonte.
+
+### 4. Escolher o grupo
 
 ```bash
 npm run list-groups
 ```
 
-Copie o ID do grupo desejado para `WHATSAPP_GROUP_ID` no `.env`.
+O comando lista todos os grupos da conta:
 
-### 5. Testar e rodar
+```
+- Achadinhos da Shopee  =>  120363000000000000@g.us
+```
+
+Copie o ID (o texto terminado em `@g.us`) para o `.env`:
+
+```env
+WHATSAPP_GROUP_ID=120363000000000000@g.us
+```
+
+### 5. Ajustar horário e quantidade (opcional)
+
+| Variável | Descrição | Padrão |
+|---|---|---|
+| `SCHEDULE_CRON` | Horário do envio diário, em formato cron, no horário de Brasília | `0 9 * * *` (todo dia às 9h) |
+| `OFFERS_PER_DAY` | Quantas ofertas mandar por envio | `5` |
+| `SHOPEE_KEYWORD` | Busca só produtos de um tema. Vazio busca os mais vendidos em geral | *(vazio)* |
+| `SHOPEE_API_URL` | Endpoint GraphQL da Shopee Brasil | `https://open-api.affiliate.shopee.com.br/graphql` |
+
+Exemplos de cron: `0 9 * * *` envia às 9h · `30 12 * * *` envia às 12h30 · `0 9,18 * * *` envia às 9h e às 18h.
+
+### 6. Rodar
 
 ```bash
-npm run test-shopee      # mostra as ofertas no terminal, sem enviar
-npm start                # robô automático, envia no horário do SCHEDULE_CRON
-npm run send-now         # envia as ofertas agora mesmo
-npm run web              # painel em http://localhost:3000
+npm start                # robô automático: fica ligado e envia no horário do SCHEDULE_CRON
+npm run send-now         # envia as ofertas para o grupo agora mesmo e encerra
+npm run web              # painel para revisar e editar antes de enviar (http://localhost:3000)
+npm run test-shopee      # só mostra as ofertas no terminal, sem enviar
 ```
+
+### Resumo rápido
+
+```bash
+git clone https://github.com/calazans17/Robo-Shopee.git && cd Robo-Shopee
+npm install
+cp .env.example .env     # preencha SHOPEE_APP_ID e SHOPEE_APP_SECRET
+npm run test-shopee      # valida a chave da Shopee
+npm run login            # escaneia o QR code com o WhatsApp
+npm run list-groups      # copia o ID do grupo para WHATSAPP_GROUP_ID no .env
+npm start                # pronto 🚀
+```
+
+### Trocando de máquina
+
+- **Jeito mais simples:** faça os passos 2 a 4 de novo na máquina nova, escaneando um QR novo.
+- **Sem escanear de novo:** copie o `.env` e a pasta `auth_baileys/` da máquina antiga para a nova.
+- ⚠️ **Não rode o robô em duas máquinas ao mesmo tempo com a mesma sessão.** O WhatsApp derruba uma das conexões e o grupo pode receber as ofertas em dobro.
+- Se aparecer `Sessao deslogada`, apague a pasta `auth_baileys/` e rode `npm run login` de novo.
 
 ## 🖥️ Painel web
 
